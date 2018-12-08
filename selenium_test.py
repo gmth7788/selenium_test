@@ -11,6 +11,11 @@ from selenium.webdriver.support.wait import WebDriverWait
 import time
 
 
+def download_xikao(browser, url=r"http://scripts.xikao.com/download"):
+    #访问页面
+    browser.get(url)
+
+
 
 
 
