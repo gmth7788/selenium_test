@@ -164,10 +164,20 @@ src_size_list):
         else:
             print("")
 
-
-if __name__=="__main__":
+def download_xikao():
+    '''
+    就是为了下载‘戏考’网站上的京剧剧本资料
+    http://scripts.xikao.com/
+    :return:
+    '''
     root_link="http://scripts.xikao.com"
     page_url="http://scripts.xikao.com/download"
+    print(r'''下载‘中国京剧戏考’网站上的京剧剧本资料
+    %s
+    ''' % root_link)
     lookup_html(root_link, page_url)
 
+
+if __name__=="__main__":
+    download_xikao()
 
