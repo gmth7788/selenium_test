@@ -38,8 +38,8 @@ def send_baidu_netdisk():
 
 
 
-def download_with_RFBP(src_path, dest_path,
-                       total_size, temp_size):
+def download_with_RFBP(src_path, dest_path, total_size,
+                       temp_size):
     '''
     断点续传(RFBP)
     从src_path偏移temp_size字节开始下载，添加到dest_path
@@ -47,8 +47,8 @@ def download_with_RFBP(src_path, dest_path,
     temp_size已经下载的字节数
     '''
     headers = {'Range': 'bytes=%d-' % temp_size}
-    r = requests.get(src_path, stream=True,
-                     verify=False, headers=headers)
+    r = requests.get(src_path, stream=True, verify=False,
+                     headers=headers)
     with open(dest_path, "ab") as f:
         for chunk in r.iter_content(chunk_size=1024):
             if chunk: 
@@ -111,7 +111,7 @@ def download_file(src_path, dest_path, src_size):
         print("src：{} {} {}".format(src_path,total_size,
                                     unit))
         print("dst: {} {} {}".format(dest_path, temp_size,
-                                     unit))
+                                    unit))
 
 
     if (total_size > temp_size):
@@ -147,9 +147,10 @@ def lookup_html(root_link, page_url):
 
     for (src_path,dest_path, src_size) in \
             zip(src_path_list, dest_path_list,
-                src_size_list):
+src_size_list):
         try:
-            download_file(src_path, dest_path, src_size)
+            download_file(src_path, dest_path,
+                          src_size)
             print("download OK.")
         except Exception as e:
             print('str(Exception):\t', str(Exception))
