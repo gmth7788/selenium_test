@@ -9,13 +9,47 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.wait import WebDriverWait
 import time
+import os
+
+
+
+
 
 def daka(browser, url=r"http://10.0.0.130"):
+    userid = "wang_bin"
+    passwd = "wangbin"
+
     browser.get(url)
 
-    # user_name=browser.find_element_by_id("username")
-    # pass_word=browser.find_element_by_id("password")
-    # btn=browser.find_element_by_id("username")
+    browser.find_element_by_id("Button2").send_keys(
+        Keys.ENTER)
+
+    browser.switch_to.window(browser.window_handles[0])
+    print(browser.current_url)
+    browser.switch_to.window(browser.window_handles[1])
+    print(browser.current_url)
+
+    browser.find_element_by_id("username").send_keys(
+        userid)
+    time.sleep(1)
+    browser.find_element_by_id("password").send_keys(
+        passwd)
+    time.sleep(1)
+    browser.find_element_by_id("password").send_keys(
+        Keys.ENTER)
+
+    browser.switch_to.window(browser.window_handles[2])
+    print(browser.current_url)
+
+    time.sleep(10)
+
+    # WebDriverWait(browser, 20, 0.5).until(
+    #     EC.presence_of_element_located(By.id(""))
+    # )
+    print(browser.current_url)
+
+
+
 
 def download_xikao(browser, url=r"http://scripts.xikao.com/download"):
     #访问页面
