@@ -17,6 +17,11 @@ def daka(browser, url=r"http://10.0.0.130"):
     # pass_word=browser.find_element_by_id("password")
     # btn=browser.find_element_by_id("username")
 
+def download_xikao(browser, url=r"http://scripts.xikao.com/download"):
+    #访问页面
+    browser.get(url)
+
+
 
     print(browser.page_source)
     # # 等待
