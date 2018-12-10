@@ -10,8 +10,18 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.wait import WebDriverWait
 import time
 
+def daka(browser, url=r"http://10.0.0.130"):
+    browser.get(url)
+
+    # user_name=browser.find_element_by_id("username")
+    # pass_word=browser.find_element_by_id("password")
+    # btn=browser.find_element_by_id("username")
 
 
+    print(browser.page_source)
+    # # 等待
+    # wait = WebDriverWait(browser, 10)
+    # wait.until(EC.presence_of_element_located((By.ID, "content_left")))
 
 
 def test(browser, url=r"http://baidu.com"):
@@ -42,7 +52,8 @@ if __name__=="__main__":
     #声明浏览器对象
     browser = webdriver.Chrome()
     try:
-        test(browser)
+        # test(browser)
+        daka(browser)
         print("terminate successfully!")
     except Exception:
         print("failed.")
