@@ -1,7 +1,9 @@
 #!/usr/bin/evn python3
 #coding=utf-8
 
+import requests
 
+from selenium.webdriver import ActionChains
 
 from selenium import webdriver
 from selenium.webdriver.common.by import By
@@ -11,9 +13,9 @@ from selenium.webdriver.support.wait import WebDriverWait
 import time
 import os
 
-
-
-
+'''
+OA打卡自动测试程序
+'''
 
 def daka(browser, url=r"http://10.0.0.130"):
     userid = "wang_bin"
@@ -21,70 +23,64 @@ def daka(browser, url=r"http://10.0.0.130"):
 
     browser.get(url)
 
-    browser.find_element_by_id("Button2").send_keys(
+    # 选择OA页面
+    browser.find_element(By.ID, "Button2").send_keys(
         Keys.ENTER)
 
-    browser.switch_to.window(browser.window_handles[0])
-    print(browser.current_url)
+    # 切换到新打开的页面
     browser.switch_to.window(browser.window_handles[1])
     print(browser.current_url)
 
-    browser.find_element_by_id("username").send_keys(
+    # 输入用户名和密码
+    browser.find_element(By.ID, "username").send_keys(
         userid)
-    time.sleep(1)
-    browser.find_element_by_id("password").send_keys(
+    browser.find_element(By.ID, "password").send_keys(
         passwd)
     time.sleep(1)
-    browser.find_element_by_id("password").send_keys(
+    browser.find_element(By.ID, "password").send_keys(
         Keys.ENTER)
 
-    browser.switch_to.window(browser.window_handles[2])
-    print(browser.current_url)
+    # 等待打开首页
+    WebDriverWait(browser, 5, 0.5).until(
+        EC.presence_of_element_located((By.ID, "DetailFrame"))
+    )
+
+    # 切换到目标表单
+    browser.switch_to.frame("DetailFrame")
+
+    # 进入“上下班登记”页面
+    browser.find_element_by_xpath(
+        "/ html / body / table[2] / tbody / tr[6] / td[1] / a[2]").send_keys(
+        Keys.ENTER)
+
+
+    # 等待打开“上下班登记”页面
+    WebDriverWait(browser, 5, 0.5).until(
+        EC.presence_of_element_located((By.ID, "CodeStr20090608"))
+    )
+
+    # 下载校验码图片文件
+    image_url = browser.find_element_by_xpath(
+        r'// *[ @ id = "frminfo"] / table[1] / tbody / tr / td[2] / div / img')
+    ActionChains(browser).context_click(image_url).perform()
+
+    # 截取当前窗口，并制定保存位置
+    browser.get_screenshot_as_file(r"D:\wangbin\my_workspace\selenium_test\Pictures\screen_1.png")
+
+
+    # r = requests.get(r"")
+    # with open(dest_path, "ab") as f:
+    #     for chunk in r.iter_content(chunk_size=1024):
+    #         if chunk:
+    #             f.write(chunk)
+    #             f.flush()
+
+    # 执行js
+    js = "window.scrollTo(100, 450)"
+    browser.execute_script(js)
 
     time.sleep(10)
-
-    # WebDriverWait(browser, 20, 0.5).until(
-    #     EC.presence_of_element_located(By.id(""))
-    # )
     print(browser.current_url)
-
-
-
-
-def download_xikao(browser, url=r"http://scripts.xikao.com/download"):
-    #访问页面
-    browser.get(url)
-
-
-
-    print(browser.page_source)
-    # # 等待
-    # wait = WebDriverWait(browser, 10)
-    # wait.until(EC.presence_of_element_located((By.ID, "content_left")))
-
-
-def test(browser, url=r"http://baidu.com"):
-    #访问页面
-    browser.get(url)
-
-
-    # 查找元素
-    # “百度一下”按钮
-    baidu_btn = browser.find_element_by_id("su")
-
-    # 输入框
-    baidu_input = browser.find_element_by_id("kw")
-
-    # 对获取到的元素调用交互方法
-    baidu_input.send_keys("Python")
-    baidu_btn.send_keys(Keys.ENTER)
-
-    # 等待
-    wait = WebDriverWait(browser, 10)
-    wait.until(EC.presence_of_element_located((By.ID, "content_left")))
-
-    pass
-
 
 
 if __name__=="__main__":
@@ -94,9 +90,10 @@ if __name__=="__main__":
         # test(browser)
         daka(browser)
         print("terminate successfully!")
-    except Exception:
+    except Exception as msg:
         print("failed.")
+        print(msg)
     finally:
-        browser.close()
+        browser.quit()
 
 
