@@ -42,7 +42,8 @@ def daka(browser, url=r"http://10.0.0.130"):
 
     # 等待打开首页
     WebDriverWait(browser, 5, 0.5).until(
-        EC.presence_of_element_located((By.ID, "DetailFrame"))
+        EC.presence_of_element_located((By.ID,
+                                        "DetailFrame"))
     )
 
     # 切换到目标表单
@@ -50,30 +51,42 @@ def daka(browser, url=r"http://10.0.0.130"):
 
     # 进入“上下班登记”页面
     browser.find_element_by_xpath(
-        "/ html / body / table[2] / tbody / tr[6] / td[1] / a[2]").send_keys(
+        "/ html / body / table[2] / tbody / tr[6]"
+        " / td[1] / a[2]").send_keys(
         Keys.ENTER)
 
 
     # 等待打开“上下班登记”页面
     WebDriverWait(browser, 5, 0.5).until(
-        EC.presence_of_element_located((By.ID, "CodeStr20090608"))
+        EC.presence_of_element_located((By.ID,
+                                        "CodeStr20090608"))
     )
 
     # 下载校验码图片文件
-    image_url = browser.find_element_by_xpath(
-        r'// *[ @ id = "frminfo"] / table[1] / tbody / tr / td[2] / div / img')
-    ActionChains(browser).context_click(image_url).perform()
+    image_element = browser.find_element_by_xpath(
+        r'// *[ @ id = "frminfo"] / table[1] / tbody'
+        r' / tr / td[2] / div / img')
+    # 方法一：不能操控右键菜单，todo
+    #ActionChains(browser).context_click(image_element).perform()
+    # 方法二
+    image_url = image_element.get_attribute("src")
+    print(image_url)
+    r = requests.get(image_url)
+    with open(r'D:\wangbin\my_workspace\selenium_test'
+              r'\Pictures\jym.png', "wb") as f:
+        for chunk in r.iter_content(chunk_size=1024):
+            if chunk:
+                f.write(chunk)
+                f.flush()
 
     # 截取当前窗口，并制定保存位置
-    browser.get_screenshot_as_file(r"D:\wangbin\my_workspace\selenium_test\Pictures\screen_1.png")
+    browser.get_screenshot_as_file(r"D:\wangbin\my_workspace"
+                                   r"\selenium_test\Pictures"
+                                   r"\screen_1.png")
+
+    # 图像降噪处理
 
 
-    # r = requests.get(r"")
-    # with open(dest_path, "ab") as f:
-    #     for chunk in r.iter_content(chunk_size=1024):
-    #         if chunk:
-    #             f.write(chunk)
-    #             f.flush()
 
     # 执行js
     js = "window.scrollTo(100, 450)"

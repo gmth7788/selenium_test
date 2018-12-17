@@ -17,9 +17,12 @@ def read_text(client, filePath):
     image = get_file_content(filePath)
     result = client.basicGeneral(image)
     print(result)
+    ret_str = ""
     for i in range(result['words_result_num']):
-        print(result['words_result'][i]['words'])
-    print()
+        # print(result['words_result'][i]['words'])
+        ret_str += result['words_result'][i]['words'] + "\n"
+    print(ret_str)
+    return ret_str
 
 def read_number(client, filePath):
     '''
@@ -31,9 +34,12 @@ def read_number(client, filePath):
     image = get_file_content(filePath)
     result = client.numbers(image)
     print(result)
+    ret_str = ""
     for i in range(result['words_result_num']):
-        print(result['words_result'][i]['words'])
-    print()
+        # print(result['words_result'][i]['words'])
+        ret_str += result['words_result'][i]['words']
+    print(ret_str)
+    return ret_str
 
 
 def aip_test():
@@ -52,6 +58,7 @@ def aip_test():
    read_text(client, r'.\Pictures\bb.png')
    read_number(client, r'.\Pictures\8460.bmp')
    read_number(client, r'.\Pictures\1770.png')
+   read_number(client, r'.\Pictures\jym.png')
 
 
 
