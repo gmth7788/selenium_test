@@ -8,6 +8,7 @@
 from aip import AipOcr
 
 
+
 def get_file_content(filePath):
     """ 读取图片 """
     with open(filePath, 'rb') as fp:
@@ -42,6 +43,9 @@ def read_number(client, filePath):
     return ret_str
 
 
+
+
+
 def aip_test():
    '''
    文本识别
@@ -53,19 +57,17 @@ def aip_test():
 
    client = AipOcr(APP_ID, API_KEY, SECRET_KEY)
 
-   read_text(client, r'.\Pictures\11.png')
-   read_text(client, r'.\Pictures\12.png')
-   read_text(client, r'.\Pictures\bb.png')
-   read_number(client, r'.\Pictures\8460.bmp')
-   read_number(client, r'.\Pictures\1770.png')
-   read_number(client, r'.\Pictures\jym.png')
+   # read_text(client, r'.\Pictures\11.png')
+   # read_text(client, r'.\Pictures\12.png')
+   # read_text(client, r'.\Pictures\bb.png')
+   # read_number(client, r'.\Pictures\8460.bmp')
+   # read_number(client, r'.\Pictures\1770.png')
+   # read_number(client, r'.\Pictures\jym.png')
 
-
-
-
-
-
-
+   read_number(client, r'.\Pictures\median.png')
+   read_number(client, r'.\Pictures\gray.png')
+   read_number(client, r'.\Pictures\hist.png')
+   read_number(client, r'.\Pictures\binary.png')
 
 
 if __name__=="__main__":

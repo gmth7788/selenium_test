@@ -2,6 +2,14 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="1d8f5f89-cb9e-45f8-b95d-5753efd6a1df" name="Default Changelist" comment="尝试打卡">
+      <change afterPath="$PROJECT_DIR$/cv2_test.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Pictures/1770.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Pictures/8460.bmp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Pictures/bb.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Pictures/jym - 副本.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Pictures/jym.png" beforeDir="false" afterPath="$PROJECT_DIR$/Pictures/jym.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Pictures/screen_1.png" beforeDir="false" afterPath="$PROJECT_DIR$/Pictures/screen_1.png" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/aip_test.py" beforeDir="false" afterPath="$PROJECT_DIR$/aip_test.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/selenium_test.py" beforeDir="false" afterPath="$PROJECT_DIR$/selenium_test.py" afterDir="false" />
     </list>
@@ -13,13 +21,13 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="375">
-      <file pinned="false" current-in-tab="false">
+      <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/selenium_test.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="224">
-              <caret line="68" column="23" selection-start-line="68" selection-start-column="23" selection-end-line="68" selection-end-column="23" />
+            <state relative-caret-position="391">
+              <caret line="152" selection-start-line="152" selection-end-line="152" />
               <folding>
-                <element signature="e#38#53#0" expanded="true" />
+                <element signature="e#60#82#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -43,11 +51,23 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/aip_test.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="525">
-              <caret line="61" lean-forward="true" selection-start-line="61" selection-end-line="61" />
+            <state relative-caret-position="601">
+              <caret line="46" lean-forward="true" selection-start-line="46" selection-end-line="46" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/cv2_test.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="1400">
+              <caret line="50" lean-forward="true" selection-start-line="50" selection-end-line="50" />
+              <folding>
+                <element signature="e#39#49#0" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -55,8 +75,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/xikao.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="469">
-              <caret line="57" column="1" lean-forward="true" selection-start-line="51" selection-end-line="57" selection-end-column="1" />
+            <state relative-caret-position="1057">
+              <caret line="57" column="1" selection-start-line="51" selection-end-line="57" selection-end-column="1" />
               <folding>
                 <element signature="e#39#54#0" expanded="true" />
               </folding>
@@ -75,8 +95,8 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>requests</find>
       <find>read_text</find>
+      <find>requests</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -87,8 +107,10 @@
       <list>
         <option value="$PROJECT_DIR$/tessercat_tst.py" />
         <option value="$PROJECT_DIR$/tesseract_test.py" />
-        <option value="$PROJECT_DIR$/selenium_test.py" />
+        <option value="$PROJECT_DIR$/Pictures/cv2_test.py" />
+        <option value="$PROJECT_DIR$/cv2_test.py" />
         <option value="$PROJECT_DIR$/aip_test.py" />
+        <option value="$PROJECT_DIR$/selenium_test.py" />
       </list>
     </option>
   </component>
@@ -126,6 +148,11 @@
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="settings.editor.selected.configurable" value="vcs.Git" />
   </component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="D:\wangbin\my_workspace\selenium_test" />
+    </key>
+  </component>
   <component name="RunDashboard">
     <option name="ruleStates">
       <list>
@@ -160,6 +187,27 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
+    <configuration name="cv2_test" type="PythonConfigurationType" factoryName="Python" temporary="true">
+      <module name="selenium_test" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/cv2_test.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
     <configuration name="selenium_test" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <module name="selenium_test" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -185,6 +233,7 @@
       <list>
         <item itemvalue="Python.selenium_test" />
         <item itemvalue="Python.aip_test" />
+        <item itemvalue="Python.cv2_test" />
       </list>
     </recent_temporary>
   </component>
@@ -297,28 +346,38 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/xikao.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="469">
-          <caret line="57" column="1" lean-forward="true" selection-start-line="51" selection-end-line="57" selection-end-column="1" />
+        <state relative-caret-position="1057">
+          <caret line="57" column="1" selection-start-line="51" selection-end-line="57" selection-end-column="1" />
           <folding>
             <element signature="e#39#54#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/selenium_test.py">
+    <entry file="file://$PROJECT_DIR$/cv2_test.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="224">
-          <caret line="68" column="23" selection-start-line="68" selection-start-column="23" selection-end-line="68" selection-end-column="23" />
+        <state relative-caret-position="1400">
+          <caret line="50" lean-forward="true" selection-start-line="50" selection-end-line="50" />
           <folding>
-            <element signature="e#38#53#0" expanded="true" />
+            <element signature="e#39#49#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/aip_test.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="525">
-          <caret line="61" lean-forward="true" selection-start-line="61" selection-end-line="61" />
+        <state relative-caret-position="601">
+          <caret line="46" lean-forward="true" selection-start-line="46" selection-end-line="46" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/selenium_test.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="391">
+          <caret line="152" selection-start-line="152" selection-end-line="152" />
+          <folding>
+            <element signature="e#60#82#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>

@@ -1,6 +1,16 @@
 #!/usr/bin/evn python3
 #coding=utf-8
 
+
+'''
+百度云BCE，文字识别
+'''
+
+from aip import AipOcr
+
+import cv2
+import numpy as np
+
 import requests
 
 from selenium.webdriver import ActionChains
@@ -12,6 +22,27 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.wait import WebDriverWait
 import time
 import os
+
+def get_file_content(filePath):
+    """ 读取图片 """
+    with open(filePath, 'rb') as fp:
+        return fp.read()
+
+def read_number(client, filePath):
+    '''
+    读数字效果差强人意
+    :param client:
+    :param filePath:
+    :return:
+    '''
+    image = get_file_content(filePath)
+    result = client.numbers(image)
+    print(result)
+    ret_str = ""
+    for i in range(result['words_result_num']):
+        # print(result['words_result'][i]['words'])
+        ret_str += result['words_result'][i]['words']
+    return ret_str
 
 '''
 OA打卡自动测试程序
@@ -84,9 +115,40 @@ def daka(browser, url=r"http://10.0.0.130"):
                                    r"\selenium_test\Pictures"
                                    r"\screen_1.png")
 
-    # 图像降噪处理
+    #################################
+    # 图像处理
+    img = cv2.imread(r'D:\wangbin\my_workspace\selenium_test'
+                     r'\Pictures\jym.png')
 
+    # 降噪
+    median_img = cv2.medianBlur(img, 3)
 
+    # 灰度图
+    gray_img = cv2.cvtColor(median_img,
+                            cv2.COLOR_RGB2GRAY)
+
+    # 直方图均衡化
+    hist_img = cv2.equalizeHist(gray_img)
+
+    # 二值化处理
+    ret, binary_img = cv2.threshold(hist_img,
+                                    140, 255,
+                                    cv2.THRESH_BINARY)
+    cv2.imwrite(r'D:\wangbin\my_workspace\selenium_test'
+                r'\Pictures\jym_0.png',
+                binary_img)
+
+    # 识别校验码
+    APP_ID = '15144944'
+    API_KEY = '9IF1gL9QKlWkI72KVW2F6gNi'
+    SECRET_KEY = 'dOh8cCvKG17KNbB3snFeZwMpFSR7Hcep '
+
+    client = AipOcr(APP_ID, API_KEY, SECRET_KEY)
+
+    check_code = read_number(client,
+                r'D:\wangbin\my_workspace\selenium_test'
+                r'\Pictures\jym_0.png')
+    print(check_code)
 
     # 执行js
     js = "window.scrollTo(100, 450)"
