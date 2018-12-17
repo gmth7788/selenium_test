@@ -44,6 +44,71 @@ def read_number(client, filePath):
         ret_str += result['words_result'][i]['words']
     return ret_str
 
+def jym_proc(image_element, path, filename):
+    '''
+    校验码处理
+    :return:
+    '''
+    # 方法一：不能操控右键菜单，todo
+    #ActionChains(browser).context_click(image_element).perform()
+    # 方法二
+    image_url = image_element.get_attribute("src")
+    print(image_url)
+    r = requests.get(image_url)
+    with open(path+filename, "wb") as f:
+        for chunk in r.iter_content(chunk_size=1024):
+            if chunk:
+                f.write(chunk)
+                f.flush()
+
+    # 截取当前窗口，并制定保存位置
+    browser.get_screenshot_as_file(path+"\screen_1.png")
+
+def image_process(path, filename, proc_filename):
+    '''
+    图像处理
+    :param path:
+    :param filename:
+    :param proc_filename:
+    :return:
+    '''
+    #################################
+    # 图像处理
+    img = cv2.imread(path+filename)
+
+    # 降噪
+    median_img = cv2.medianBlur(img, 3)
+
+    # 灰度图
+    gray_img = cv2.cvtColor(median_img,
+                            cv2.COLOR_RGB2GRAY)
+
+    # 直方图均衡化
+    hist_img = cv2.equalizeHist(gray_img)
+
+    # 二值化处理
+    ret, binary_img = cv2.threshold(hist_img,
+                                    140, 255,
+                                    cv2.THRESH_BINARY)
+    cv2.imwrite(path+proc_filename, binary_img)
+
+def image_recognition(path, proc_filename):
+    '''
+    图像识别
+    :param path:
+    :param proc_filename:
+    :return:
+    '''
+    APP_ID = '15144944'
+    API_KEY = '9IF1gL9QKlWkI72KVW2F6gNi'
+    SECRET_KEY = 'dOh8cCvKG17KNbB3snFeZwMpFSR7Hcep '
+
+    client = AipOcr(APP_ID, API_KEY, SECRET_KEY)
+
+    check_code = read_number(client, path+proc_filename)
+    return check_code
+
+
 '''
 OA打卡自动测试程序
 '''
@@ -93,62 +158,38 @@ def daka(browser, url=r"http://10.0.0.130"):
                                         "CodeStr20090608"))
     )
 
-    # 下载校验码图片文件
-    image_element = browser.find_element_by_xpath(
-        r'// *[ @ id = "frminfo"] / table[1] / tbody'
-        r' / tr / td[2] / div / img')
-    # 方法一：不能操控右键菜单，todo
-    #ActionChains(browser).context_click(image_element).perform()
-    # 方法二
-    image_url = image_element.get_attribute("src")
-    print(image_url)
-    r = requests.get(image_url)
-    with open(r'D:\wangbin\my_workspace\selenium_test'
-              r'\Pictures\jym.png', "wb") as f:
-        for chunk in r.iter_content(chunk_size=1024):
-            if chunk:
-                f.write(chunk)
-                f.flush()
+    # 处理校验码
+    path = r'D:\wangbin\my_workspace\selenium_test\Pictures'
+    filename = r'\jym.png'
+    proc_filename = r'\jym_0.png'
+    for i in range(10):
+        # 下载校验码图片文件
+        image_element = browser.find_element_by_xpath(
+            r'// *[ @ id = "frminfo"] / table[1] / tbody'
+            r' / tr / td[2] / div / img')
+        jym_proc(image_element, path, filename)
 
-    # 截取当前窗口，并制定保存位置
-    browser.get_screenshot_as_file(r"D:\wangbin\my_workspace"
-                                   r"\selenium_test\Pictures"
-                                   r"\screen_1.png")
+        # 图像处理
+        image_process(path, filename, proc_filename)
 
-    #################################
-    # 图像处理
-    img = cv2.imread(r'D:\wangbin\my_workspace\selenium_test'
-                     r'\Pictures\jym.png')
+        # 图像识别
+        check_code = image_recognition(path, proc_filename)
+        print(check_code)
+        if len(check_code) == 4:
+            print("ok. jym="+check_code)
+            break
+        else:
+            print("failed. try again.")
 
-    # 降噪
-    median_img = cv2.medianBlur(img, 3)
+    # 输入验证码
+    jym_input_element = browser.find_element_by_xpath(
+        r'// *[ @ id = "CodeStr20090608"]')
+    jym_input_element.send_keys(check_code)
 
-    # 灰度图
-    gray_img = cv2.cvtColor(median_img,
-                            cv2.COLOR_RGB2GRAY)
-
-    # 直方图均衡化
-    hist_img = cv2.equalizeHist(gray_img)
-
-    # 二值化处理
-    ret, binary_img = cv2.threshold(hist_img,
-                                    140, 255,
-                                    cv2.THRESH_BINARY)
-    cv2.imwrite(r'D:\wangbin\my_workspace\selenium_test'
-                r'\Pictures\jym_0.png',
-                binary_img)
-
-    # 识别校验码
-    APP_ID = '15144944'
-    API_KEY = '9IF1gL9QKlWkI72KVW2F6gNi'
-    SECRET_KEY = 'dOh8cCvKG17KNbB3snFeZwMpFSR7Hcep '
-
-    client = AipOcr(APP_ID, API_KEY, SECRET_KEY)
-
-    check_code = read_number(client,
-                r'D:\wangbin\my_workspace\selenium_test'
-                r'\Pictures\jym_0.png')
-    print(check_code)
+    # 上班/下班登记
+    jym_input_element = browser.find_element_by_xpath(
+        r'// *[ @ id = "frminfo"] / table[2] / tbody / tr[3] / td[4] / a')
+    jym_input_element.send_keys(Keys.ENTER)
 
     # 执行js
     js = "window.scrollTo(100, 450)"
