@@ -328,15 +328,20 @@ def daka(browser, url=r"http://10.0.0.130"):
         r'// *[ @ id = "CodeStr20090608"]')
     jym_input_element.send_keys(check_code)
 
-    # # 上班/下班登记
-    # # todo:
-    # jym_input_element = browser.find_element_by_xpath(
-    #     r'// *[ @ id = "frminfo"] / table[2] / tbody / tr[3] / td[4] / a')
-    # jym_input_element.send_keys(Keys.ENTER)
+    # 上班/下班登记
+    # todo:
+    jym_input_element = browser.find_element_by_xpath(
+        r'// *[ @ id = "frminfo"] / table[2] / tbody / tr[3] / td[4] / a')
+    jym_input_element.send_keys(Keys.ENTER)
+
+    # 确认对话框
+    # browser.switch_to_alert().accept()
 
     # 执行js
     js = "window.scrollTo(100, 450)"
     browser.execute_script(js)
+
+    time.sleep(2)
 
     return ret
 
@@ -346,7 +351,7 @@ if __name__=="__main__":
     browser = webdriver.Chrome()
     try:
         if 0 == daka(browser):
-            print("terminate successfully!")
+            print("打卡成功。")
         else:
             print("打卡失败！")
     except Exception as msg:
