@@ -25,21 +25,21 @@ def read_text(client, filePath):
     print(ret_str)
     return ret_str
 
-def read_number(client, filePath):
+def read_number(client, file_name):
     '''
     读数字效果差强人意
     :param client:
-    :param filePath:
+    :param filename:
     :return:
     '''
-    image = get_file_content(filePath)
+    image = get_file_content(file_name)
     result = client.numbers(image)
     print(result)
     ret_str = ""
     for i in range(result['words_result_num']):
         # print(result['words_result'][i]['words'])
         ret_str += result['words_result'][i]['words']
-    print(ret_str)
+    print("{}: {}".format(file_name, ret_str))
     return ret_str
 
 
@@ -64,10 +64,10 @@ def aip_test():
    # read_number(client, r'.\Pictures\1770.png')
    # read_number(client, r'.\Pictures\jym.png')
 
-   read_number(client, r'.\Pictures\median.png')
-   read_number(client, r'.\Pictures\gray.png')
-   read_number(client, r'.\Pictures\hist.png')
-   read_number(client, r'.\Pictures\binary.png')
+   read_number(client, r'.\Pictures\median_img.png')
+   read_number(client, r'.\Pictures\gray_img.png')
+   read_number(client, r'.\Pictures\hist_img.png')
+   # read_number(client, r'.\Pictures\binary_img.png')
 
 
 if __name__=="__main__":

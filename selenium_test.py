@@ -7,7 +7,7 @@
 '''
 from aip import AipOcr
 
-from PIL import Image
+
 
 import win32api
 import win32con
@@ -15,18 +15,33 @@ import win32gui
 
 import cv2
 import numpy as np
-
-import requests
-
-from selenium.webdriver import ActionChains
+from PIL import Image
 
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.wait import WebDriverWait
+from selenium.webdriver import ActionChains
+from selenium.common.exceptions import NoSuchElementException
+
+import requests
+
 import time
+import datetime
 import os
+import re
+import traceback
+
+
+
+def log(msg):
+    '''
+    错误输出
+    :param msg: 消息信息
+    :return:
+    '''
+    print(msg)
 
 def get_file_content(file_name):
     '''
@@ -46,10 +61,10 @@ def read_number(aip_ocr, file_name):
     '''
     image = get_file_content(file_name)
     result = aip_ocr.numbers(image)
-    print(result)
+    log(result)
     ret_str = ""
     for i in range(result['words_result_num']):
-        # print(result['words_result'][i]['words'])
+        # log(result['words_result'][i]['words'])
         ret_str += result['words_result'][i]['words']
     return ret_str
 
@@ -63,7 +78,7 @@ def jym_proc_3(browser, image_element, file_name):
     :param file_name: 校验码文件名
     :return:
     '''
-    print("校验码处理，方法三")
+    log("校验码处理，方法三")
 
     root_path = os.path.dirname(file_name)
 
@@ -72,7 +87,7 @@ def jym_proc_3(browser, image_element, file_name):
 
     # 获取验证码的x，y轴
     location = image_element.location
-    print(location)
+    log(location)
     location['x'] = 1995
     location['y'] = 87
 
@@ -83,7 +98,7 @@ def jym_proc_3(browser, image_element, file_name):
         int(location['x']), int(location['y']),
         int(location['x']) + size['width'],
         int(location['y']) + size['height'])
-    print(rect_range)
+    log(rect_range)
 
     img = Image.open(root_path+r"\tmp.png")
     checkcode_img = img.crop(rect_range)
@@ -98,7 +113,7 @@ def jym_proc_1(browser, image_element, root_path, file_name):
     # 删除“C:\Users\lenovo\Downloads\Kq_GetCode.asp”
     cmd_str = r"del /F C:\Users\lenovo\Downloads\Kq_GetCode.asp"
     ret = os.popen(cmd_str)
-    print("删除图片(%s)" % ret)
+    log("删除图片(%s)" % ret)
 
     # 右键弹出菜单
     ActionChains(browser).context_click(image_element).perform()
@@ -121,7 +136,7 @@ def jym_proc_1(browser, image_element, root_path, file_name):
         win32gui.PostMessage(hwnd, win32con.WM_KEYUP,
                              win32con.VK_RETURN, 0)
     else:
-        print("can't found window.")
+        log("can't found window.")
 
     # 另存图片
     # 将“C:\Users\lenovo\Downloads\Kq_GetCode.asp”
@@ -129,11 +144,11 @@ def jym_proc_1(browser, image_element, root_path, file_name):
     cmd_str = r"copy /Y C:\Users\lenovo\Downloads\Kq_GetCode.asp " \
               r"D:\wangbin\my_workspace\selenium_test\Pictures\jym.png "
     ret = os.popen(cmd_str)
-    print("另存图片(%s)" % ret)
+    log("另存图片(%s)" % ret)
 
     # 截取当前窗口，并制定保存位置
     browser.get_screenshot_as_file(root_path+"\screen_1.png")
-    print("校验码处理，方法一")
+    log("校验码处理，方法一")
 
 
 def jym_proc_2(browser, image_element, root_path, file_name):
@@ -142,7 +157,7 @@ def jym_proc_2(browser, image_element, root_path, file_name):
     :return:
     '''
     image_url = image_element.get_attribute("src")
-    print(image_url)
+    log(image_url)
     r = requests.get(image_url)
     with open(root_path+file_name, "wb") as f:
         for chunk in r.iter_content(chunk_size=1024):
@@ -222,7 +237,7 @@ def login_oa(browser, url):
 
     # 切换到新打开的页面
     browser.switch_to.window(browser.window_handles[1])
-    print(browser.current_url)
+    log(browser.current_url)
 
     # 输入用户名和密码
     browser.find_element(By.ID, "username").send_keys(
@@ -238,7 +253,7 @@ def login_oa(browser, url):
         EC.presence_of_element_located((By.ID,
                                         "DetailFrame"))
     )
-    print(browser.current_url)
+    log(browser.current_url)
 
 def refresh_oa(browser):
     '''
@@ -262,7 +277,7 @@ def refresh_oa(browser):
         EC.presence_of_element_located(
             (By.ID, "CodeStr20090608")))
 
-    print(browser.current_url)
+    log(browser.current_url)
 
 
 def get_jym(browser):
@@ -292,15 +307,32 @@ def get_jym(browser):
         check_code = image_recognition(root_path+jym0_filename)
         if len(check_code) == 4:
             ret = 0
-            print("ok. jym="+check_code)
+            log("ok. jym="+check_code)
             break
         else:
             ret = -1
             check_code = ''
-            print("failed. try again.")
+            log("failed. try again.")
             refresh_oa(browser)
 
     return ((ret, check_code))
+
+def get_exp_logout_time(browser):
+    '''
+    获得应当下班时间
+    :param browser:
+    :return: 返回datetime类型
+    '''
+    ydxbsj = browser.find_element_by_xpath(
+        r'//*[@id="frminfo"]/table[3]/tbody/tr/td[2]/font')
+    log(ydxbsj.text)
+    l = re.findall(r'(\d+)\:(\d+):(\d+)', ydxbsj.text)
+    t = tuple(l[0])
+    n = datetime.datetime.now()
+    t0 = datetime.datetime(n.year, n.month, n.day,
+                           int(t[0]), int(t[1]), int(t[2]))
+    log(t0)
+    return t0
 
 def daka(browser, url=r"http://10.0.0.130"):
     '''
@@ -318,26 +350,35 @@ def daka(browser, url=r"http://10.0.0.130"):
     # 获取校验码
     (ret, check_code) = get_jym(browser)
     if ret != 0:
-        print("获取校验码失败！")
+        log("获取校验码失败！")
         return ret
     else:
-        print("获取校验码成功。")
+        log("获取校验码成功。")
 
     # 输入验证码
     jym_input_element = browser.find_element_by_xpath(
         r'// *[ @ id = "CodeStr20090608"]')
     jym_input_element.send_keys(check_code)
 
-    # 上班/下班登记
-    # 上班登记
-    login_jym_input_element = browser.find_element_by_xpath(
-        r'//*[@id="frminfo"]/table[2]/tbody/tr[2]/td[4]/a')
-    login_jym_input_element.send_keys(Keys.ENTER)
+    # 获取应当下班时间
+    t0 = get_exp_logout_time(browser)
+    t0 = t0 + datetime.timedelta(minutes=5) # 向后推迟5分钟
+    log(t0)
 
-    # 下班登记
-    logout_jym_input_element = browser.find_element_by_xpath(
-        r'//*[@id="frminfo"]/table[2]/tbody/tr[3]/td[4]/a')
-    logout_jym_input_element.send_keys(Keys.ENTER)
+    # 上班/下班登记
+    # 获取当前时间
+    now_time = datetime.datetime.now()
+    if now_time.hour < 10:
+        # 上午10点前，尝试上班登记
+        login_jym_input_element = browser.find_element_by_xpath(
+            r'//*[@id="frminfo"]/table[2]/tbody/tr[2]/td[4]/a')
+        login_jym_input_element.send_keys(Keys.ENTER)
+
+    if now_time > t0:
+        # 尝试下班登记
+        logout_jym_input_element = browser.find_element_by_xpath(
+            r'//*[@id="frminfo"]/table[2]/tbody/tr[3]/td[4]/a')
+        logout_jym_input_element.send_keys(Keys.ENTER)
 
     # 确认对话框
     # browser.switch_to_alert().accept()
@@ -356,12 +397,20 @@ if __name__=="__main__":
     browser = webdriver.Chrome()
     try:
         if 0 == daka(browser):
-            print("打卡成功。")
+            log("打卡成功。")
         else:
-            print("打卡失败！")
-    except Exception as msg:
-        print("failed.")
-        print(msg)
+            log("打卡失败！")
+    except NoSuchElementException as msg:
+        log("NoSuchElementException")
+        log(msg)
+    except Exception as e:
+        log('str(Exception):\t'+str(Exception))
+        log('str(e):\t\t'+str(e))
+        log('repr(e):\t'+repr(e))
+        log('traceback.print_exc():')
+        log(traceback.print_exc())
+        log('traceback.format_exc():\n')
+        log(traceback.format_exc())
     finally:
         browser.quit()
 
