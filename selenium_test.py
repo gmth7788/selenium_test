@@ -139,10 +139,8 @@ def jym_proc_1(browser, image_element, root_path, file_name):
         log("can't found window.")
 
     # 另存图片
-    # 将“C:\Users\lenovo\Downloads\Kq_GetCode.asp”
-    # 另存为“D:\wangbin\my_workspace\selenium_test\Pictures\jym.png”
     cmd_str = r"copy /Y C:\Users\lenovo\Downloads\Kq_GetCode.asp " \
-              r"D:\wangbin\my_workspace\selenium_test\Pictures\jym.png "
+              r".\Pictures\jym.png "
     ret = os.popen(cmd_str)
     log("另存图片(%s)" % ret)
 
@@ -286,7 +284,8 @@ def get_jym(browser):
     :param browser: 浏览器对象
     :return: 成功返回(0, 校验码字符串)，否则返回(-1, '')
     '''
-    root_path = r'D:\wangbin\my_workspace\selenium_test\Pictures'
+    # root_path = r'D:\wangbin\my_workspace\selenium_test\Pictures'
+    root_path = r'.\Pictures'
     jym_filename = r'\jym.png'
     jym0_filename = r'\jym_0.png'
 
