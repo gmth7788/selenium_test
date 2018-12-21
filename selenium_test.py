@@ -329,10 +329,15 @@ def daka(browser, url=r"http://10.0.0.130"):
     jym_input_element.send_keys(check_code)
 
     # 上班/下班登记
-    # todo:
-    jym_input_element = browser.find_element_by_xpath(
-        r'// *[ @ id = "frminfo"] / table[2] / tbody / tr[3] / td[4] / a')
-    jym_input_element.send_keys(Keys.ENTER)
+    # 上班登记
+    login_jym_input_element = browser.find_element_by_xpath(
+        r'//*[@id="frminfo"]/table[2]/tbody/tr[2]/td[4]/a')
+    login_jym_input_element.send_keys(Keys.ENTER)
+
+    # 下班登记
+    logout_jym_input_element = browser.find_element_by_xpath(
+        r'//*[@id="frminfo"]/table[2]/tbody/tr[3]/td[4]/a')
+    logout_jym_input_element.send_keys(Keys.ENTER)
 
     # 确认对话框
     # browser.switch_to_alert().accept()
