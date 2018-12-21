@@ -32,6 +32,7 @@ import datetime
 import os
 import re
 import traceback
+import logging
 
 
 
@@ -42,6 +43,7 @@ def log(msg):
     :return:
     '''
     print(msg)
+    logging.info(msg)
 
 def get_file_content(file_name):
     '''
@@ -393,6 +395,11 @@ def daka(browser, url=r"http://10.0.0.130"):
 
 
 if __name__=="__main__":
+    LOG_FORMAT = "%(asctime)s - %(levelname)s - %(message)s"
+    logging.basicConfig(filename='daka.log',
+                        level=logging.INFO,
+                        format=LOG_FORMAT)
+
     browser = webdriver.Chrome()
     try:
         if 0 == daka(browser):
