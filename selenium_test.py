@@ -319,6 +319,37 @@ def get_jym(browser):
 
     return ((ret, check_code))
 
+def my_login(browser):
+    '''
+    上班登记
+    :param browser:
+    :return: 成功返回0
+    '''
+    ret = 0
+    try:
+        login_jym_input_element = browser.find_element_by_xpath(
+            r'//*[@id="frminfo"]/table[2]/tbody/tr[2]/td[4]/a')
+        login_jym_input_element.send_keys(Keys.ENTER)
+    except NoSuchElementException as msg:
+        ret = -101
+    return ret
+
+def my_logout(browser):
+    '''
+    下班登记
+    :param browser:
+    :return: 成功返回0
+    '''
+    ret = 0
+    try:
+        logout_jym_input_element = browser.find_element_by_xpath(
+            r'//*[@id="frminfo"]/table[2]/tbody/tr[3]/td[4]/a')
+        logout_jym_input_element.send_keys(Keys.ENTER)
+    except NoSuchElementException as msg:
+        ret = -102
+    return ret
+
+
 def get_exp_logout_time(browser):
     '''
     获得应当下班时间
@@ -366,12 +397,11 @@ def daka(browser, url=r"http://10.0.0.130"):
 
         # 上班/下班登记
         # 获取当前时间
+        ret = -100
         now_time = datetime.datetime.now()
         if now_time.hour < 10:
             # 上午10点前，尝试上班登记
-            login_jym_input_element = browser.find_element_by_xpath(
-                r'//*[@id="frminfo"]/table[2]/tbody/tr[2]/td[4]/a')
-            login_jym_input_element.send_keys(Keys.ENTER)
+            ret = my_login(browser)
         else:
             # 获取应当下班时间
             t0 = get_exp_logout_time(browser)
@@ -379,9 +409,7 @@ def daka(browser, url=r"http://10.0.0.130"):
             log(t0)
             if now_time > t0:
                 # 尝试下班登记
-                logout_jym_input_element = browser.find_element_by_xpath(
-                    r'//*[@id="frminfo"]/table[2]/tbody/tr[3]/td[4]/a')
-                logout_jym_input_element.send_keys(Keys.ENTER)
+                ret = my_logout(browser)
 
         try:
             # 校验码不正确对话框
@@ -391,7 +419,8 @@ def daka(browser, url=r"http://10.0.0.130"):
                 browser.switch_to_alert().accept()
         except NoAlertPresentException as msg:
             # 校验码通过校验，退出循环
-            break
+            if 0 == ret:
+                break
 
 
     # 执行js
@@ -412,10 +441,11 @@ if __name__=="__main__":
 
     browser = webdriver.Chrome()
     try:
-        if 0 == daka(browser):
+        ret = daka(browser)
+        if 0 == ret:
             log("打卡成功。")
         else:
-            log("打卡失败！")
+            log("打卡失败！({})".format(ret))
     except NoSuchElementException as msg:
         log("NoSuchElementException")
         log(msg)
