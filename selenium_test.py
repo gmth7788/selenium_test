@@ -345,44 +345,52 @@ def daka(browser, url=r"http://10.0.0.130"):
     # 登录到OA
     login_oa(browser, url)
 
-    # 刷新OA首页
-    refresh_oa(browser)
+    for i in range(10):
 
-    # 获取校验码
-    (ret, check_code) = get_jym(browser)
-    if ret != 0:
-        log("获取校验码失败！")
-        return ret
-    else:
-        log("获取校验码成功。")
+        # 刷新OA首页
+        refresh_oa(browser)
 
-    # 输入验证码
-    jym_input_element = browser.find_element_by_xpath(
-        r'// *[ @ id = "CodeStr20090608"]')
-    jym_input_element.send_keys(check_code)
+        # 获取校验码
+        (ret, check_code) = get_jym(browser)
+        if ret != 0:
+            log("获取校验码失败！")
+            return ret
+        else:
+            log("获取校验码成功。")
 
-    # 获取应当下班时间
-    t0 = get_exp_logout_time(browser)
-    t0 = t0 + datetime.timedelta(minutes=5) # 向后推迟5分钟
-    log(t0)
+        # 输入验证码
+        jym_input_element = browser.find_element_by_xpath(
+            r'// *[ @ id = "CodeStr20090608"]')
+        jym_input_element.send_keys(check_code)
 
-    # 上班/下班登记
-    # 获取当前时间
-    now_time = datetime.datetime.now()
-    if now_time.hour < 10:
-        # 上午10点前，尝试上班登记
-        login_jym_input_element = browser.find_element_by_xpath(
-            r'//*[@id="frminfo"]/table[2]/tbody/tr[2]/td[4]/a')
-        login_jym_input_element.send_keys(Keys.ENTER)
+        # 上班/下班登记
+        # 获取当前时间
+        now_time = datetime.datetime.now()
+        if now_time.hour < 10:
+            # 上午10点前，尝试上班登记
+            login_jym_input_element = browser.find_element_by_xpath(
+                r'//*[@id="frminfo"]/table[2]/tbody/tr[2]/td[4]/a')
+            login_jym_input_element.send_keys(Keys.ENTER)
+        else:
+            # 获取应当下班时间
+            t0 = get_exp_logout_time(browser)
+            t0 = t0 + datetime.timedelta(minutes=5)  # 向后推迟5分钟
+            log(t0)
+            if now_time > t0:
+                # 尝试下班登记
+                logout_jym_input_element = browser.find_element_by_xpath(
+                    r'//*[@id="frminfo"]/table[2]/tbody/tr[3]/td[4]/a')
+                logout_jym_input_element.send_keys(Keys.ENTER)
 
-    if now_time > t0:
-        # 尝试下班登记
-        logout_jym_input_element = browser.find_element_by_xpath(
-            r'//*[@id="frminfo"]/table[2]/tbody/tr[3]/td[4]/a')
-        logout_jym_input_element.send_keys(Keys.ENTER)
+        # 确认对话框
+        alert = browser.switch_to_alert()
+        if alert.text == "校验码不正确！":
+            log("校验码不正确，重新打卡。")
+            browser.switch_to_alert().accept()
+        else:
+            log("打卡成功")
+            break
 
-    # 确认对话框
-    # browser.switch_to_alert().accept()
 
     # 执行js
     js = "window.scrollTo(100, 450)"
