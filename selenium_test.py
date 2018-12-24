@@ -24,6 +24,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver import ActionChains
 from selenium.common.exceptions import NoSuchElementException
+from selenium.common.exceptions import NoAlertPresentException
 
 import requests
 
@@ -345,7 +346,7 @@ def daka(browser, url=r"http://10.0.0.130"):
     # 登录到OA
     login_oa(browser, url)
 
-    for i in range(10):
+    for i in range(100):
 
         # 刷新OA首页
         refresh_oa(browser)
@@ -382,13 +383,14 @@ def daka(browser, url=r"http://10.0.0.130"):
                     r'//*[@id="frminfo"]/table[2]/tbody/tr[3]/td[4]/a')
                 logout_jym_input_element.send_keys(Keys.ENTER)
 
-        # 确认对话框
-        alert = browser.switch_to_alert()
-        if alert.text == "校验码不正确！":
-            log("校验码不正确，重新打卡。")
-            browser.switch_to_alert().accept()
-        else:
-            log("打卡成功")
+        try:
+            # 校验码不正确对话框
+            alert = browser.switch_to.alert()
+            if alert.text == "校验码不正确！":
+                log("校验码不正确，重新打卡。")
+                browser.switch_to_alert().accept()
+        except NoAlertPresentException as msg:
+            # 校验码通过校验，退出循环
             break
 
 
