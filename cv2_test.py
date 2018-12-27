@@ -5,6 +5,9 @@
 import cv2
 import numpy as np
 
+'''
+cv2 图像处理
+'''
 
 
 def output_img(img, file):
