@@ -38,8 +38,10 @@ import re
 import traceback
 import logging
 
-
-
+LOG_FILE = r'./daka.log'
+IMAGE_FILE = r'./Pictures/result.png'
+TMP_IMAGE_FILE = r'./Pictures/tmp.png'
+JYM_IMAGE_FILE = r'./Pictures/jym.png'
 
 def get_attachment(file):
     '''
@@ -72,15 +74,16 @@ def get_image(file):
     '''
     sendfile = open(file, 'rb').read()
     image = MIMEImage(sendfile)
-    image.add_header('Content_ID', '<image1')
+    image.add_header('Content_ID', '<image1>')
     return image
 
 
-def send_mail(info):
+def send_mail(info, flag):
     '''
     发送邮件
     :return:
     '''
+    smtp_server = 'smtp.163.com'
     send_user = 'bin_cn1@163.com'
     send_pwd = ''
     recv_user = 'orchard2046@163.com'
@@ -91,16 +94,19 @@ def send_mail(info):
     msg['To'] = recv_user
 
     text_plain = get_text_plain(info)
-    text_attach = get_attachment(r'./daka.log')
-    text_image1 = get_image(r'./Pictures/tmp.png')
-    text_image2 = get_image(r'./Pictures/jym.png')
+    text_attach = get_attachment(LOG_FILE)
+    if "OK" == flag:
+        text_image1 = get_image(IMAGE_FILE)
+    else:
+        text_image1 = get_image(TMP_IMAGE_FILE)
+    text_image2 = get_image(JYM_IMAGE_FILE)
     msg.attach(text_plain)
     msg.attach(text_attach)
     msg.attach(text_image1)
     msg.attach(text_image2)
 
     smtp = smtplib.SMTP()
-    smtp.connect('smtp.163.com')
+    smtp.connect(smtp_server)
     smtp.login(send_user, send_pwd)
     smtp.sendmail(send_user, recv_user,
                   msg.as_string())
@@ -275,7 +281,7 @@ def image_process(input_file, output_file):
 
 def image_recognition(file_name):
     '''
-    图像识别
+    百度图像识别
     :param file_name: 文件名
     :return: 返回校验码字符串
     '''
@@ -446,7 +452,7 @@ def daka(browser, url=r"http://10.0.0.130"):
     # 登录到OA
     login_oa(browser, url)
 
-    for i in range(100):
+    for i in range(3):
 
         # 刷新OA首页
         refresh_oa(browser)
@@ -489,6 +495,8 @@ def daka(browser, url=r"http://10.0.0.130"):
         except NoAlertPresentException as msg:
             # 校验码通过校验，退出循环
             if 0 == ret:
+                # 截取当前窗口，并制定保存位置
+                browser.get_screenshot_as_file(IMAGE_FILE)
                 break
 
 
@@ -513,8 +521,9 @@ if __name__=="__main__":
         ret = daka(browser)
         if 0 == ret:
             log("打卡成功。")
-            send_mail("打卡成功")
+            send_mail("打卡成功", "OK")
         else:
+            send_mail("打卡失败", "FAILED")
             log("打卡失败！({})".format(ret))
     except NoSuchElementException as msg:
         log("NoSuchElementException")
