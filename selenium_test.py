@@ -367,6 +367,12 @@ def get_jym(browser):
     jym_filename = r'\jym.png'
     jym0_filename = r'\jym_0.png'
 
+    # 创建root_path
+    try:
+        os.mkdir(root_path)
+    except:
+        pass
+
     for i in range(10):
         # 下载校验码图片文件
         image_element = browser.find_element_by_xpath(
