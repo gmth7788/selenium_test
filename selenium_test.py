@@ -7,6 +7,9 @@
 '''
 from aip import AipOcr
 
+import configparser
+import pyautogui
+
 import win32api
 import win32con
 import win32gui
@@ -42,6 +45,63 @@ LOG_FILE = r'./daka.log'
 IMAGE_FILE = r'./Pictures/result.png'
 TMP_IMAGE_FILE = r'./Pictures/tmp.png'
 JYM_IMAGE_FILE = r'./Pictures/jym.png'
+
+DAKA_CONFIG_FILE = r"./daka.ini"
+
+class daka_config:
+    '''
+    daka配置
+    '''
+
+    def __init__(self):
+        if os.path.exists(DAKA_CONFIG_FILE):
+            self.get_config(DAKA_CONFIG_FILE)
+        else:
+            log("读取配置文件[%s]失败。" % DAKA_CONFIG_FILE)
+
+    def get_config(self, cfg_file):
+        '''
+        读取配置文件
+        :param cfg_file: 配置文件名
+        :return:
+        '''
+        config = configparser.ConfigParser()
+        config.read(cfg_file)
+        sections = config.sections()
+
+        self.userid = config['USER']['userid']
+        self.passwd = config['USER']['passwd']
+
+        self.root_path = config['COMMON']['root_path']
+        self.image_path = self.root_path + '\\' + 'Pictures'
+        self.log_file = config['COMMON']['log_file']
+        self.image_file = config['COMMON']['image_file']
+        self.tmp_image_file = config['COMMON']['tmp_image_file']
+        self.jym_image_file = config['COMMON']['jym_image_file']
+
+        self.smtp_server = config['MAIL']['smtp_server']
+        self.send_user = config['MAIL']['send_user']
+        self.send_pwd = config['MAIL']['send_pwd']
+        self.recv_user = config['MAIL']['recv_user']
+        self.subject = config['MAIL']['subject']
+
+        self.baidu_app_id = config['BAIDU_APP']['APP_ID']
+        self.baidu_api_key = config['BAIDU_APP']['API_KEY']
+        self.baidu_secret_key = config['BAIDU_APP']['SECRET_KEY']
+
+
+def pyautogui_set():
+    '''
+    PyAutoGUI设置
+    :return:
+    '''
+    # 把鼠标光标在屏幕左上角，PyAutoGUI函数就会产生
+    # pyautogui.FailSafeException异常，这样就能
+    # 终止PyAutoGUI执行。
+    pyautogui.FAILSAFE = True
+
+    # 所有的PyAutoGUI函数增加延迟，2.5秒
+    pyautogui.PAUSE = 1.0
 
 def get_attachment(file):
     '''
@@ -83,13 +143,14 @@ def send_mail(info, flag):
     发送邮件
     :return:
     '''
-    smtp_server = 'smtp.163.com'
-    send_user = 'bin_cn1@163.com'
-    send_pwd = ''
-    recv_user = 'orchard2046@163.com'
+    cfg = daka_config()
+    smtp_server = cfg.smtp_server
+    send_user = cfg.send_user
+    send_pwd = cfg.send_pwd
+    recv_user = cfg.recv_user
 
     msg = MIMEMultipart('mixed')
-    msg['Subject'] = "daka result"
+    msg['Subject'] = cfg.subject
     msg['From'] = send_user
     msg['To'] = recv_user
 
@@ -146,6 +207,41 @@ def read_number(aip_ocr, file_name):
         ret_str += result['words_result'][i]['words']
     return ret_str
 
+
+def jym_proc_4(browser, image_element, file_name):
+    '''
+    校验码处理，方法四
+    使用pyAutoGUI完成界面操作
+    :param browser:
+    :param image_element:
+    :param file_name:
+    :return:
+    '''
+    log("校验码处理，方法四")
+
+    root_path = os.path.dirname(file_name)
+
+    # 右键弹出菜单
+    ActionChains(browser).context_click(image_element).perform()
+    pyautogui.press("down")
+    pyautogui.press("down")
+    pyautogui.press("enter")
+    # win32api.keybd_event(40, 0, 0, 0)  # DOWN ARROW
+    # win32api.keybd_event(40, 0, 0, 0)  # DOWN ARROW
+    # win32api.keybd_event(13, 0, 0, 0)  # ENTER
+
+    # 弹出“另存为”对话框
+    pyautogui.typewrite(file_name)
+    pyautogui.press("enter")
+    pyautogui.press("tab")
+    pyautogui.press("enter")
+
+    # 截取当前窗口，并制定保存位置
+    browser.get_screenshot_as_file(r"%s\screen_1.png" %
+                                   root_path)
+
+
+
 def jym_proc_3(browser, image_element, file_name):
     '''
     校验码处理，方法三，截取页面快照中的校验码
@@ -159,9 +255,6 @@ def jym_proc_3(browser, image_element, file_name):
     log("校验码处理，方法三")
 
     root_path = os.path.dirname(file_name)
-
-    # 截取当前窗口，并制定保存位置
-    browser.get_screenshot_as_file(root_path+r"\tmp.png")
 
     # 获取验证码的x，y轴
     location = image_element.location
@@ -182,10 +275,39 @@ def jym_proc_3(browser, image_element, file_name):
     checkcode_img = img.crop(rect_range)
     checkcode_img.save(file_name)
 
+    # 截取当前窗口，并制定保存位置
+    browser.get_screenshot_as_file(r"%s\screen_1.png" %
+                                   root_path)
+
+
+def jym_proc_2(browser, image_element, file_name):
+    '''
+    校验码处理，方法二
+    再次发起request后，返回的验证码就不是本次会话的验证码了，
+    这个方法不行。
+    :return:
+    '''
+    log("校验码处理，方法二")
+
+    root_path = os.path.dirname(file_name)
+
+    image_url = image_element.get_attribute("src")
+    log(image_url)
+    r = requests.get(image_url)
+    with open(root_path+file_name, "wb") as f:
+        for chunk in r.iter_content(chunk_size=1024):
+            if chunk:
+                f.write(chunk)
+                f.flush()
+
+    # 截取当前窗口，并制定保存位置
+    browser.get_screenshot_as_file(r"%s\screen_1.png" %
+                                   root_path)
+
 
 def jym_proc_1(browser, image_element, root_path, file_name):
     '''
-    校验码处理，方法一
+    校验码处理，方法一，丢弃不用
     :return:
     '''
     # 删除“C:\Users\lenovo\Downloads\Kq_GetCode.asp”
@@ -227,22 +349,6 @@ def jym_proc_1(browser, image_element, root_path, file_name):
     log("校验码处理，方法一")
 
 
-def jym_proc_2(browser, image_element, root_path, file_name):
-    '''
-    校验码处理，方法二
-    :return:
-    '''
-    image_url = image_element.get_attribute("src")
-    log(image_url)
-    r = requests.get(image_url)
-    with open(root_path+file_name, "wb") as f:
-        for chunk in r.iter_content(chunk_size=1024):
-            if chunk:
-                f.write(chunk)
-                f.flush()
-
-    # 截取当前窗口，并制定保存位置
-    browser.get_screenshot_as_file(root_path+"\screen_1.png")
 
 def image_process(input_file, output_file):
     '''
@@ -259,16 +365,16 @@ def image_process(input_file, output_file):
 
     # 降噪
     median_img = cv2.medianBlur(img, 3)
-    cv2.imwrite(root_path + r"\median_img.png", median_img)
+    cv2.imwrite(root_path + "\\" + r"median_img.png", median_img)
 
     # 灰度图
     gray_img = cv2.cvtColor(median_img,
                             cv2.COLOR_RGB2GRAY)
-    cv2.imwrite(root_path + r"\gray_img.png", gray_img)
+    cv2.imwrite(root_path + "\\" + r"gray_img.png", gray_img)
 
     # 直方图均衡化
     hist_img = cv2.equalizeHist(gray_img)
-    cv2.imwrite(root_path + r"\hist_img.png", hist_img)
+    cv2.imwrite(root_path + "\\" + r"hist_img.png", hist_img)
 
     # 二值化处理
     # ret, binary_img = cv2.threshold(
@@ -285,11 +391,11 @@ def image_recognition(file_name):
     :param file_name: 文件名
     :return: 返回校验码字符串
     '''
-    APP_ID = '15144944'
-    API_KEY = '9IF1gL9QKlWkI72KVW2F6gNi'
-    SECRET_KEY = 'dOh8cCvKG17KNbB3snFeZwMpFSR7Hcep '
+    cfg = daka_config()
 
-    aip_ocr = AipOcr(APP_ID, API_KEY, SECRET_KEY)
+    aip_ocr = AipOcr(cfg.baidu_app_id,
+                     cfg.baidu_api_key,
+                     cfg.baidu_secret_key)
 
     check_code = read_number(aip_ocr, file_name)
     return check_code
@@ -302,8 +408,7 @@ def login_oa(browser, url):
     :url: OA地址
     :return:
     '''
-    userid = "wang_bin"
-    passwd = "wangbin"
+    cfg = daka_config()
 
     browser.get(url)
 
@@ -317,9 +422,9 @@ def login_oa(browser, url):
 
     # 输入用户名和密码
     browser.find_element(By.ID, "username").send_keys(
-        userid)
+        cfg.userid)
     browser.find_element(By.ID, "password").send_keys(
-        passwd)
+        cfg.passwd)
     time.sleep(1)
     browser.find_element(By.ID, "password").send_keys(
         Keys.ENTER)
@@ -362,14 +467,11 @@ def get_jym(browser):
     :param browser: 浏览器对象
     :return: 成功返回(0, 校验码字符串)，否则返回(-1, '')
     '''
-    # root_path = r'D:\wangbin\my_workspace\selenium_test\Pictures'
-    root_path = r'.\Pictures'
-    jym_filename = r'\jym.png'
-    jym0_filename = r'\jym_0.png'
+    cfg = daka_config()
 
-    # 创建root_path
+    # 创建image_path
     try:
-        os.mkdir(root_path)
+        os.mkdir(cfg.image_path)
     except:
         pass
 
@@ -380,14 +482,16 @@ def get_jym(browser):
             r' / tr / td[2] / div / img')
         # jym_proc_2(browser, image_element, root_path, jym_filename)
         # jym_proc_1(browser, image_element, root_path, jym_filename)
-        jym_proc_3(browser, image_element, root_path+jym_filename)
+        # jym_proc_3(browser, image_element, root_path+jym_filename)
+        jym_proc_4(browser, image_element,
+                   cfg.image_path + '\\' + cfg.jym_image_file)
 
         # 图像处理
-        image_process(root_path+jym_filename,
-                      root_path+jym0_filename)
+        image_process(cfg.image_path + '\\' + cfg.jym_image_file,
+                      cfg.image_path + '\\' + "tmp.png")
 
         # 图像识别
-        check_code = image_recognition(root_path+jym0_filename)
+        check_code = image_recognition(cfg.image_path + '\\' + "tmp.png")
         if len(check_code) == 4:
             ret = 0
             log("ok. jym="+check_code)
@@ -517,8 +621,12 @@ def daka(browser, url=r"http://10.0.0.130"):
 
 
 if __name__=="__main__":
+    cfg = daka_config()
+
+    pyautogui_set()
+
     LOG_FORMAT = "%(asctime)s - %(levelname)s - %(message)s"
-    logging.basicConfig(filename='daka.log',
+    logging.basicConfig(filename=cfg.log_file,
                         level=logging.INFO,
                         format=LOG_FORMAT)
 
