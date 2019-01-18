@@ -98,7 +98,8 @@ def pyautogui_set():
     # 把鼠标光标在屏幕左上角，PyAutoGUI函数就会产生
     # pyautogui.FailSafeException异常，这样就能
     # 终止PyAutoGUI执行。
-    pyautogui.FAILSAFE = True
+    # 上线版本要设置为False
+    pyautogui.FAILSAFE = False
 
     # 所有的PyAutoGUI函数增加延迟，2.5秒
     pyautogui.PAUSE = 1.0
