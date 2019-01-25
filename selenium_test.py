@@ -563,7 +563,7 @@ def daka(browser, url=r"http://10.0.0.130"):
     # 登录到OA
     login_oa(browser, url)
 
-    for i in range(3):
+    for i in range(100):
 
         # 刷新OA首页
         refresh_oa(browser)
@@ -603,6 +603,8 @@ def daka(browser, url=r"http://10.0.0.130"):
             if alert.text == "校验码不正确！":
                 log("校验码不正确，重新打卡。")
                 browser.switch_to_alert().accept()
+        except TypeError as msg:
+            pass
         except NoAlertPresentException as msg:
             # 校验码通过校验，退出循环
             if 0 == ret:
