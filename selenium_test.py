@@ -603,15 +603,21 @@ def daka(browser, url=r"http://10.0.0.130"):
             if alert.text == "校验码不正确！":
                 log("校验码不正确，重新打卡。")
                 browser.switch_to_alert().accept()
-        except TypeError as msg:
-            pass
         except NoAlertPresentException as msg:
             # 校验码通过校验，退出循环
             if 0 == ret:
                 # 截取当前窗口，并制定保存位置
                 browser.get_screenshot_as_file(IMAGE_FILE)
                 break
-
+        except Exception as e:
+            log('str(Exception):\t' + str(Exception))
+            log('str(e):\t\t' + str(e))
+            log('repr(e):\t' + repr(e))
+            log('traceback.print_exc():')
+            log(traceback.print_exc())
+            log('traceback.format_exc():\n')
+            log(traceback.format_exc())
+            continue
 
     # 执行js
     js = "window.scrollTo(100, 450)"
