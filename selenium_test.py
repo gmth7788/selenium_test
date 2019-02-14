@@ -220,6 +220,10 @@ def jym_proc_4(browser, image_element, file_name):
     '''
     log("校验码处理，方法四")
 
+    # 鼠标移到屏幕中央
+    screenWidth, screenHeight = pyautogui.size()
+    pyautogui.moveTo(screenWidth / 2, screenHeight / 2)
+
     root_path = os.path.dirname(file_name)
 
     # 右键弹出菜单
@@ -476,32 +480,28 @@ def get_jym(browser):
     except:
         pass
 
-    for i in range(10):
-        # 下载校验码图片文件
-        image_element = browser.find_element_by_xpath(
-            r'// *[ @ id = "frminfo"] / table[1] / tbody'
-            r' / tr / td[2] / div / img')
-        # jym_proc_2(browser, image_element, root_path, jym_filename)
-        # jym_proc_1(browser, image_element, root_path, jym_filename)
-        # jym_proc_3(browser, image_element, root_path+jym_filename)
-        jym_proc_4(browser, image_element,
-                   cfg.image_path + '\\' + cfg.jym_image_file)
+    # 下载校验码图片文件
+    image_element = browser.find_element_by_xpath(
+        r'// *[ @ id = "frminfo"] / table[1] / tbody'
+        r' / tr / td[2] / div / img')
+    # jym_proc_2(browser, image_element, root_path, jym_filename)
+    # jym_proc_1(browser, image_element, root_path, jym_filename)
+    # jym_proc_3(browser, image_element, root_path+jym_filename)
+    jym_proc_4(browser, image_element,
+               cfg.image_path + '\\' + cfg.jym_image_file)
 
-        # 图像处理
-        image_process(cfg.image_path + '\\' + cfg.jym_image_file,
-                      cfg.image_path + '\\' + "tmp.png")
+    # 图像处理
+    image_process(cfg.image_path + '\\' + cfg.jym_image_file,
+                  cfg.image_path + '\\' + "tmp.png")
 
-        # 图像识别
-        check_code = image_recognition(cfg.image_path + '\\' + "tmp.png")
-        if len(check_code) == 4:
-            ret = 0
-            log("ok. jym="+check_code)
-            break
-        else:
-            ret = -1
-            check_code = ''
-            log("failed. try again.")
-            refresh_oa(browser)
+    # 图像识别
+    check_code = image_recognition(cfg.image_path + '\\' + "tmp.png")
+    if len(check_code) == 4:
+        ret = 0
+        log("ok. jym="+check_code)
+    else:
+        ret = -1
+        check_code = ''
 
     return ((ret, check_code))
 
@@ -572,7 +572,7 @@ def daka(browser, url=r"http://10.0.0.130"):
         (ret, check_code) = get_jym(browser)
         if ret != 0:
             log("获取校验码失败！")
-            return ret
+            continue
         else:
             log("获取校验码成功。")
 
@@ -600,6 +600,7 @@ def daka(browser, url=r"http://10.0.0.130"):
         try:
             # 校验码不正确对话框
             alert = browser.switch_to.alert()
+            print("弹出对话框:" + alert.text)
             if alert.text == "校验码不正确！":
                 log("校验码不正确，重新打卡。")
                 browser.switch_to_alert().accept()
