@@ -610,7 +610,7 @@ def daka(browser, url=r"http://10.0.0.130"):
                 # 截取当前窗口，并制定保存位置
                 browser.get_screenshot_as_file(IMAGE_FILE)
                 break
-        except Exception as e:
+        except (TypeError, Exception) as e:
             log('str(Exception):\t' + str(Exception))
             log('str(e):\t\t' + str(e))
             log('repr(e):\t' + repr(e))
