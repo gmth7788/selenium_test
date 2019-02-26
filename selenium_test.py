@@ -517,8 +517,10 @@ def my_login(browser):
             r'//*[@id="frminfo"]/table[2]/tbody/tr[2]/td[4]/a')
         login_jym_input_element.send_keys(Keys.ENTER)
     except NoSuchElementException as msg:
-        ret = -101
+        # 未发现上班登记链接，已经打卡
+        ret = 100
     return ret
+
 
 def my_logout(browser):
     '''
@@ -532,7 +534,8 @@ def my_logout(browser):
             r'//*[@id="frminfo"]/table[2]/tbody/tr[3]/td[4]/a')
         logout_jym_input_element.send_keys(Keys.ENTER)
     except NoSuchElementException as msg:
-        ret = -102
+        # 未发现下班登记链接，已经打卡
+        ret = 100
     return ret
 
 
@@ -563,6 +566,7 @@ def daka(browser, url=r"http://10.0.0.130"):
     # 登录到OA
     login_oa(browser, url)
 
+    ret = -1
     for i in range(100):
 
         # 刷新OA首页
@@ -583,7 +587,6 @@ def daka(browser, url=r"http://10.0.0.130"):
 
         # 上班/下班登记
         # 获取当前时间
-        ret = -100
         now_time = datetime.datetime.now()
         if now_time.hour < 10:
             # 上午10点前，尝试上班登记
@@ -597,34 +600,42 @@ def daka(browser, url=r"http://10.0.0.130"):
                 # 尝试下班登记
                 ret = my_logout(browser)
 
-        try:
-            # 校验码不正确对话框
-            alert = browser.switch_to.alert()
-            print("弹出对话框:" + alert.text)
-            if alert.text == "校验码不正确！":
-                log("校验码不正确，重新打卡。")
-                browser.switch_to_alert().accept()
-        except NoAlertPresentException as msg:
-            # 校验码通过校验，退出循环
-            if 0 == ret:
-                # 截取当前窗口，并制定保存位置
-                browser.get_screenshot_as_file(IMAGE_FILE)
-                break
-        except (TypeError, Exception) as e:
-            log('str(Exception):\t' + str(Exception))
-            log('str(e):\t\t' + str(e))
-            log('repr(e):\t' + repr(e))
-            log('traceback.print_exc():')
-            log(traceback.print_exc())
-            log('traceback.format_exc():\n')
-            log(traceback.format_exc())
+        if ret != 100:
             continue
+        else:
+            # 截取当前窗口，并制定保存位置
+            browser.get_screenshot_as_file(IMAGE_FILE)
+            ret = 0
+            break
 
-    # 执行js
-    js = "window.scrollTo(100, 450)"
-    browser.execute_script(js)
+        # try:
+        #     # 校验码不正确对话框
+        #     alert = browser.switch_to.alert()
+        #     print("弹出对话框:" + alert.text)
+        #     if alert.text == "校验码不正确！":
+        #         log("校验码不正确，重新打卡。")
+        #         browser.switch_to_alert().accept()
+        # except NoAlertPresentException as msg:
+        #     # 校验码通过校验，退出循环
+        #     if 0 == ret:
+        #         # 截取当前窗口，并制定保存位置
+        #         browser.get_screenshot_as_file(IMAGE_FILE)
+        #         break
+        # except (TypeError, Exception) as e:
+        #     log('str(Exception):\t' + str(Exception))
+        #     log('str(e):\t\t' + str(e))
+        #     log('repr(e):\t' + repr(e))
+        #     log('traceback.print_exc():')
+        #     log(traceback.print_exc())
+        #     log('traceback.format_exc():\n')
+        #     log(traceback.format_exc())
+        #     continue
 
-    time.sleep(2)
+    # # 执行js
+    # js = "window.scrollTo(100, 450)"
+    # browser.execute_script(js)
+    #
+    # time.sleep(2)
 
     return ret
 
@@ -649,9 +660,6 @@ if __name__=="__main__":
         else:
             send_mail("打卡失败", "FAILED")
             log("打卡失败！({})".format(ret))
-    except NoSuchElementException as msg:
-        log("NoSuchElementException")
-        log(msg)
     except Exception as e:
         log('str(Exception):\t'+str(Exception))
         log('str(e):\t\t'+str(e))
