@@ -600,11 +600,12 @@ def daka(browser, url=r"http://10.0.0.130"):
                 # 尝试下班登记
                 ret = my_logout(browser)
 
+        # 截取当前窗口，并制定保存位置
+        browser.get_screenshot_as_file(IMAGE_FILE)
+
         if ret != 100:
             continue
         else:
-            # 截取当前窗口，并制定保存位置
-            browser.get_screenshot_as_file(IMAGE_FILE)
             ret = 0
             break
 
