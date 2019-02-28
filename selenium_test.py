@@ -567,14 +567,13 @@ def daka(browser, url=r"http://10.0.0.130"):
     login_oa(browser, url)
 
     ret = -1
-    for i in range(100):
-
+    for i in range(10):
         # 刷新OA首页
         refresh_oa(browser)
 
         # 获取校验码
-        (ret, check_code) = get_jym(browser)
-        if ret != 0:
+        (ret_jym, check_code) = get_jym(browser)
+        if ret_jym != 0:
             log("获取校验码失败！")
             continue
         else:
@@ -592,13 +591,18 @@ def daka(browser, url=r"http://10.0.0.130"):
             # 上午10点前，尝试上班登记
             ret = my_login(browser)
         else:
-            # 获取应当下班时间
+            # 获取下班时间
             t0 = get_exp_logout_time(browser)
-            t0 = t0 + datetime.timedelta(minutes=5)  # 向后推迟5分钟
+            t0 = t0 + datetime.timedelta(minutes=0)  # 向后推迟5分钟
             log(t0)
             if now_time > t0:
                 # 尝试下班登记
                 ret = my_logout(browser)
+            else:
+                log("当前时间:{0}，期望时间：{1}，未到打卡时间。".format(
+                    now_time.strftime("%I:%M:%S"),
+                    t0.strftime("%I:%M:%S")))
+                continue
 
         # 截取当前窗口，并制定保存位置
         browser.get_screenshot_as_file(IMAGE_FILE)
@@ -608,35 +612,6 @@ def daka(browser, url=r"http://10.0.0.130"):
         else:
             ret = 0
             break
-
-        # try:
-        #     # 校验码不正确对话框
-        #     alert = browser.switch_to.alert()
-        #     print("弹出对话框:" + alert.text)
-        #     if alert.text == "校验码不正确！":
-        #         log("校验码不正确，重新打卡。")
-        #         browser.switch_to_alert().accept()
-        # except NoAlertPresentException as msg:
-        #     # 校验码通过校验，退出循环
-        #     if 0 == ret:
-        #         # 截取当前窗口，并制定保存位置
-        #         browser.get_screenshot_as_file(IMAGE_FILE)
-        #         break
-        # except (TypeError, Exception) as e:
-        #     log('str(Exception):\t' + str(Exception))
-        #     log('str(e):\t\t' + str(e))
-        #     log('repr(e):\t' + repr(e))
-        #     log('traceback.print_exc():')
-        #     log(traceback.print_exc())
-        #     log('traceback.format_exc():\n')
-        #     log(traceback.format_exc())
-        #     continue
-
-    # # 执行js
-    # js = "window.scrollTo(100, 450)"
-    # browser.execute_script(js)
-    #
-    # time.sleep(2)
 
     return ret
 
@@ -652,24 +627,26 @@ if __name__=="__main__":
                         level=logging.INFO,
                         format=LOG_FORMAT)
 
-    browser = webdriver.Chrome()
-    try:
-        ret = daka(browser)
-        if 0 == ret:
-            log("打卡成功。")
-            send_mail("打卡成功", "OK")
-        else:
-            send_mail("打卡失败", "FAILED")
-            log("打卡失败！({})".format(ret))
-    except Exception as e:
-        log('str(Exception):\t'+str(Exception))
-        log('str(e):\t\t'+str(e))
-        log('repr(e):\t'+repr(e))
-        log('traceback.print_exc():')
-        log(traceback.print_exc())
-        log('traceback.format_exc():\n')
-        log(traceback.format_exc())
-    finally:
-        browser.quit()
+    for i in range(100):
+        browser = webdriver.Chrome()
+        try:
+            ret = daka(browser)
+            if 0 == ret:
+                log("打卡成功。")
+                send_mail("打卡成功", "OK")
+                break
+            else:
+                send_mail("打卡失败", "FAILED")
+                log("打卡失败！({})".format(ret))
+        except Exception as e:
+            log('str(Exception):\t'+str(Exception))
+            log('str(e):\t\t'+str(e))
+            log('repr(e):\t'+repr(e))
+            log('traceback.print_exc():')
+            log(traceback.print_exc())
+            log('traceback.format_exc():\n')
+            log(traceback.format_exc())
+        finally:
+            browser.quit()
 
 
