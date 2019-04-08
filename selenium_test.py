@@ -7,6 +7,11 @@
 '''
 from aip import AipOcr
 
+'''
+pytesseract图像识别
+'''
+import pytesseract
+
 import configparser
 import pyautogui
 
@@ -406,6 +411,21 @@ def image_recognition(file_name):
     return check_code
 
 
+def image_recognition_tesseract(input_file):
+    '''
+    pytesseract图像识别
+    返回校验码
+    :param input_file: 校验码图片
+    :return: 成功返回校验码，否则抛出异常
+    '''
+    img = Image.open(input_file)
+    text = pytesseract.image_to_string(img, lang='eng',
+                                       config='--psm 6 -c tessedit_char_whitelist=0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz')
+    text = text.replace(' ', '')
+    print("获得识别码:{0}".format(text))
+    return text
+
+
 def login_oa(browser, url):
     '''
     登录到OA
@@ -495,7 +515,10 @@ def get_jym(browser):
                   cfg.image_path + '\\' + "tmp.png")
 
     # 图像识别
-    check_code = image_recognition(cfg.image_path + '\\' + "tmp.png")
+    # check_code = image_recognition(
+    #     cfg.image_path + '\\' + "tmp.png")
+    check_code = image_recognition_tesseract(
+        cfg.image_path + '\\' + "tmp.png")
     if len(check_code) == 4:
         ret = 0
         log("ok. jym="+check_code)
