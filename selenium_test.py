@@ -656,10 +656,10 @@ if __name__=="__main__":
             ret = daka(browser)
             if 0 == ret:
                 log("打卡成功。")
-                send_mail("打卡成功", "OK")
+                # send_mail("打卡成功", "OK")
                 break
             else:
-                send_mail("打卡失败", "FAILED")
+                # send_mail("打卡失败", "FAILED")
                 log("打卡失败！({})".format(ret))
         except Exception as e:
             log('str(Exception):\t'+str(Exception))
